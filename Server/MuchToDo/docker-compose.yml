@@ -1,0 +1,42 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  backend:
+    build:
+      context: .
+      network: host
+    container_name: backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/much_todo_db
+      DB_NAME: much_todo_db
+      JWT_SECRET_KEY: f1c382465ab189db695ddd518b80c2cb938adccf9a6046bc35c06a56b0ea3290
+      LOG_LEVEL: info
+      LOG_FORMAT: json
+    networks:
+      - backend_network
+
+volumes:
+  mongo_data:
+
+networks:
+  backend_network:

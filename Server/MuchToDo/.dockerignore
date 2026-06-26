@@ -1,0 +1,14 @@
+.git
+.gitignore
+README.md
+
+terraform/
+evidence/
+
+Dockerfile
+docker-compose.yml
+
+*.tfstate
+*.tfvars
+
+#.env
